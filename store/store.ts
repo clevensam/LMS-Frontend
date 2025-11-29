@@ -1,0 +1,229 @@
+import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { User, Course, Achievement, Lesson, Submission, Post, Comment } from '../types';
+import { MOCK_USER, COURSES, ACHIEVEMENTS, COMMUNITY_POSTS } from '../constants';
+
+// --- Auth Slice ---
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+}
+
+const initialAuthState: AuthState = {
+  user: null, // Start null to show login
+  isAuthenticated: false,
+};
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState: initialAuthState,
+  reducers: {
+    login: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+    },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+        if (state.user) {
+            state.user = { ...state.user, ...action.payload };
+        }
+    }
+  },
+});
+
+export const { login, logout, updateUser } = authSlice.actions;
+
+// --- Course Slice ---
+interface CourseState {
+  catalog: Course[];
+  enrolled: Course[];
+  currentCourse: Course | null;
+  submissions: Submission[];
+  filter: string;
+}
+
+const initialCourseState: CourseState = {
+  catalog: COURSES,
+  enrolled: COURSES.filter(c => (c.progress ?? 0) > 0),
+  currentCourse: null,
+  submissions: [
+      {
+          id: 's1',
+          lessonId: 'l100', // Mock ID
+          studentId: 'u1',
+          studentName: 'Alex Johnson',
+          submittedAt: new Date().toISOString(),
+          content: 'Here is my essay on React Hooks.',
+          status: 'pending'
+      }
+  ],
+  filter: 'All',
+};
+
+const courseSlice = createSlice({
+  name: 'courses',
+  initialState: initialCourseState,
+  reducers: {
+    setFilter: (state, action: PayloadAction<string>) => {
+      state.filter = action.payload;
+    },
+    setCurrentCourse: (state, action: PayloadAction<string>) => {
+      state.currentCourse = state.catalog.find(c => c.id === action.payload) || null;
+    },
+    enrollCourse: (state, action: PayloadAction<string>) => {
+      const course = state.catalog.find(c => c.id === action.payload);
+      // Check if already enrolled
+      if (course && !state.enrolled.find(c => c.id === course.id)) {
+        // Initialize progress to 0
+        const enrolledCourse = { ...course, progress: 0 };
+        state.enrolled.push(enrolledCourse);
+      }
+    },
+    updateProgress: (state, action: PayloadAction<{courseId: string, progress: number}>) => {
+        const course = state.catalog.find(c => c.id === action.payload.courseId);
+        // Also update the enrolled instance
+        const enrolledCourse = state.enrolled.find(c => c.id === action.payload.courseId);
+        
+        if (course) {
+            course.progress = action.payload.progress;
+        }
+        if (enrolledCourse) {
+            enrolledCourse.progress = action.payload.progress;
+        } else if (course && action.payload.progress > 0) {
+             state.enrolled.push(course);
+        }
+    },
+    addCourse: (state, action: PayloadAction<Course>) => {
+      state.catalog.unshift(action.payload);
+    },
+    addModule: (state, action: PayloadAction<{courseId: string, title: string}>) => {
+        const course = state.catalog.find(c => c.id === action.payload.courseId);
+        if (course) {
+            const newModule = {
+                id: `m${Date.now()}`,
+                title: action.payload.title,
+                lessons: []
+            };
+            course.modules.push(newModule);
+        }
+    },
+    addLesson: (state, action: PayloadAction<{courseId: string, moduleId: string, lesson: Lesson}>) => {
+         const course = state.catalog.find(c => c.id === action.payload.courseId);
+         if (course) {
+             const module = course.modules.find(m => m.id === action.payload.moduleId);
+             if (module) {
+                 module.lessons.push(action.payload.lesson);
+             }
+         }
+    },
+    togglePublish: (state, action: PayloadAction<{courseId: string, isPublished: boolean}>) => {
+        const course = state.catalog.find(c => c.id === action.payload.courseId);
+        if (course) {
+            course.isPublished = action.payload.isPublished;
+        }
+    },
+    submitAssignment: (state, action: PayloadAction<Submission>) => {
+        state.submissions.push(action.payload);
+    },
+    gradeSubmission: (state, action: PayloadAction<{id: string, grade: number, feedback: string}>) => {
+        const sub = state.submissions.find(s => s.id === action.payload.id);
+        if (sub) {
+            sub.status = 'graded';
+            sub.grade = action.payload.grade;
+            sub.feedback = action.payload.feedback;
+        }
+    }
+  },
+});
+
+export const { setFilter, setCurrentCourse, enrollCourse, updateProgress, addCourse, addModule, addLesson, togglePublish, submitAssignment, gradeSubmission } = courseSlice.actions;
+
+// --- Gamification Slice ---
+interface GamificationState {
+  points: number;
+  badges: Achievement[];
+}
+
+const initialGamificationState: GamificationState = {
+  points: MOCK_USER.points,
+  badges: ACHIEVEMENTS.filter(a => MOCK_USER.badges.includes(a.id)),
+};
+
+const gamificationSlice = createSlice({
+  name: 'gamification',
+  initialState: initialGamificationState,
+  reducers: {
+    addPoints: (state, action: PayloadAction<number>) => {
+      state.points += action.payload;
+    },
+  },
+});
+
+export const { addPoints } = gamificationSlice.actions;
+
+// --- Community Slice ---
+interface CommunityState {
+  posts: Post[];
+}
+
+const initialCommunityState: CommunityState = {
+  posts: COMMUNITY_POSTS,
+};
+
+const communitySlice = createSlice({
+  name: 'community',
+  initialState: initialCommunityState,
+  reducers: {
+    addPost: (state, action: PayloadAction<Post>) => {
+      state.posts.unshift(action.payload);
+    },
+    toggleLike: (state, action: PayloadAction<{ postId: string; userId: string }>) => {
+        const post = state.posts.find(p => p.id === action.payload.postId);
+        if (post) {
+            const index = post.likedBy.indexOf(action.payload.userId);
+            if (index > -1) {
+                // Unlike
+                post.likedBy.splice(index, 1);
+                post.likes--;
+            } else {
+                // Like
+                post.likedBy.push(action.payload.userId);
+                post.likes++;
+            }
+        }
+    },
+    addComment: (state, action: PayloadAction<{ postId: string; comment: Comment }>) => {
+        const post = state.posts.find(p => p.id === action.payload.postId);
+        if (post) {
+            if (!post.comments) post.comments = [];
+            post.comments.push(action.payload.comment);
+        }
+    },
+    addReply: (state, action: PayloadAction<{ postId: string; commentId: string; reply: Comment }>) => {
+        const post = state.posts.find(p => p.id === action.payload.postId);
+        if (post) {
+            const comment = post.comments.find(c => c.id === action.payload.commentId);
+            if (comment) {
+                if (!comment.replies) comment.replies = [];
+                comment.replies.push(action.payload.reply);
+            }
+        }
+    },
+  },
+});
+
+export const { addPost, toggleLike, addComment, addReply } = communitySlice.actions;
+
+export const store = configureStore({
+  reducer: {
+    auth: authSlice.reducer,
+    courses: courseSlice.reducer,
+    gamification: gamificationSlice.reducer,
+    community: communitySlice.reducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

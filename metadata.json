@@ -1,0 +1,7 @@
+{
+  "name": "MUST-LMS",
+  "description": "Mbeya University of Science and Technology - Learning Management System",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
