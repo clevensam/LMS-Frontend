@@ -55,9 +55,11 @@ LMS is a lightweight, elegant, and fully responsive learning platform designed f
 ```bash
 git clone https://https://github.com/clevensam/LMS-Frontent.git
 cd LMS-Frontend
+
 ### Install Dependencies
 ```bash
 npm install
+
 ### Start Development Server
 ```bash
 npm run dev
