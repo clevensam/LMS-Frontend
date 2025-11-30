@@ -1,4 +1,4 @@
-# Learning Manangement System (LMS)**
+# Learning Manangement System (LMS)
 
 <div align="center">
 
