@@ -1,4 +1,4 @@
-# 🎓 **LearnFlow LMS**
+# Learning Manangement System (LMS)**
 
 <div align="center">
 
@@ -8,16 +8,14 @@
 <img src="https://img.shields.io/badge/Vite-4.4-646CFF?style=for-the-badge&logo=vite" />
 
 <br /><br />
-
 ✨ **A modern and clean Learning Management System built with React & Tailwind CSS** ✨
-
 </div>
 
 ---
 
 ## ✨ **Overview**
 
-LearnFlow LMS is a lightweight, elegant, and fully responsive learning platform designed for students, instructors, and administrators. It delivers a smooth learning experience with essential LMS features and a modern UI.
+LMS is a lightweight, elegant, and fully responsive learning platform designed for students, instructors, and administrators. It delivers a smooth learning experience with essential LMS features and a modern UI.
 
 ---
 
@@ -55,5 +53,5 @@ LearnFlow LMS is a lightweight, elegant, and fully responsive learning platform 
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/yourusername/learnflow-lms.git
-cd learnflow-lms
+git clone https://https://github.com/clevensam/LMS-Frontent.git
+cd LMS-Frontend
