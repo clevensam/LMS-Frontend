@@ -46,26 +46,26 @@ export interface Lesson {
   title: string;
   type: 'video' | 'quiz' | 'reading' | 'assignment';
   duration: string;
-  completed?: boolean;
-  content?: string; // Markdown or video URL
-  questions?: QuizQuestion[]; // For quizzes
-  assignmentInstructions?: string; // For assignments
+  completed: boolean;
+  questions?: QuizQuestion[];
+  assignmentInstructions?: string;
+  videoUrl?: string; // Added for YouTube videos
+  content?: string; // Added for reading content
 }
 
+// In ../types.ts
 export interface Submission {
   id: string;
   lessonId: string;
   studentId: string;
   studentName: string;
   submittedAt: string;
-  content?: string; // Text submission
-  fileUrl?: string; // Uploaded file
+  content: string;
   fileName?: string;
-  status: 'pending' | 'graded';
+  status: 'pending' | 'reviewed' | 'graded'; // Add all your statuses here
   grade?: number;
   feedback?: string;
 }
-
 export interface Achievement {
   id: string;
   name: string;
@@ -100,4 +100,20 @@ export interface Post {
   likedBy: string[]; // Array of user IDs
   comments: Comment[];
   time: string;
+}
+
+export interface Certificate {
+  id: string;
+  studentName: string;
+  courseTitle: string;
+  issueDate: string;
+  code: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  type: 'course' | 'exam' | 'holiday' | 'maintenance';
+  description?: string;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { Card, ProgressBar, Badge, Button } from '../components/Common';
-import { Play, Award, TrendingUp, BookOpen, Plus, FileText, CheckCircle, Users, Settings } from 'lucide-react';
+import { Play, Award, TrendingUp, BookOpen, Plus, FileText, CheckCircle, Users, Settings, Activity, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ACHIEVEMENTS } from '../constants';
 
@@ -18,11 +18,16 @@ const Dashboard: React.FC = () => {
           <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">System Administration</h1>
-                    <p className="mt-1 text-slate-500">Overview of system status and users.</p>
+                    <h1 className="text-2xl font-bold text-slate-900">System Dashboard</h1>
+                    <p className="mt-1 text-slate-500">Real-time overview of MUST LMS activity and performance.</p>
+                </div>
+                <div className="flex space-x-3 mt-4 md:mt-0">
+                    <Button variant="secondary" icon={FileText} onClick={() => navigate('/admin/reports')}>Generate Report</Button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              {/* Key Metrics */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <Card className="p-6 flex items-center space-x-4">
                     <div className="p-3 bg-blue-100 rounded-lg">
                         <Users className="h-6 w-6 text-blue-600" />
@@ -37,27 +42,86 @@ const Dashboard: React.FC = () => {
                         <BookOpen className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-slate-500">Total Courses</p>
-                        <p className="text-2xl font-bold text-slate-900">{catalog.length}</p>
+                        <p className="text-sm font-medium text-slate-500">Active Courses</p>
+                        <p className="text-2xl font-bold text-slate-900">{catalog.filter(c => c.isPublished).length}</p>
                     </div>
                   </Card>
                   <Card className="p-6 flex items-center space-x-4">
                     <div className="p-3 bg-green-100 rounded-lg">
-                        <CheckCircle className="h-6 w-6 text-green-600" />
+                        <Activity className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-slate-500">System Status</p>
-                        <p className="text-2xl font-bold text-green-600">Healthy</p>
+                        <p className="text-sm font-medium text-slate-500">Daily Active</p>
+                        <p className="text-2xl font-bold text-green-600">842</p>
+                    </div>
+                  </Card>
+                   <Card className="p-6 flex items-center space-x-4">
+                    <div className="p-3 bg-red-100 rounded-lg">
+                        <AlertCircle className="h-6 w-6 text-red-600" />
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500">Pending Approvals</p>
+                        <p className="text-2xl font-bold text-red-600">3</p>
                     </div>
                   </Card>
               </div>
-              <Card className="p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
-                  <div className="flex space-x-4">
-                      <Button icon={Users} onClick={() => navigate('/admin/users')}>Manage Users</Button>
-                      <Button variant="secondary" icon={Settings}>System Settings</Button>
-                  </div>
-              </Card>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Daily Activity Monitor */}
+                  <Card className="p-6">
+                      <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Activity Monitoring</h3>
+                      <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                              <span className="text-sm text-slate-600">Student Logins</span>
+                              <div className="w-2/3">
+                                  <ProgressBar value={85} />
+                              </div>
+                              <span className="text-sm font-bold text-slate-900">85%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                              <span className="text-sm text-slate-600">Course Completions</span>
+                              <div className="w-2/3">
+                                  <ProgressBar value={40} />
+                              </div>
+                               <span className="text-sm font-bold text-slate-900">42</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                              <span className="text-sm text-slate-600">Assignment Uploads</span>
+                              <div className="w-2/3">
+                                  <ProgressBar value={65} />
+                              </div>
+                               <span className="text-sm font-bold text-slate-900">128</span>
+                          </div>
+                      </div>
+                  </Card>
+
+                  {/* Quick Actions */}
+                  <Card className="p-6">
+                      <h3 className="text-lg font-bold text-slate-900 mb-4">Admin Quick Actions</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                          <button onClick={() => navigate('/admin/users')} className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-green-500 transition-all text-left">
+                              <Users className="h-6 w-6 text-slate-500 mb-2" />
+                              <p className="font-medium text-slate-900">Manage Users</p>
+                              <p className="text-xs text-slate-500">Add, edit or block</p>
+                          </button>
+                          <button onClick={() => navigate('/admin/courses')} className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-green-500 transition-all text-left">
+                              <BookOpen className="h-6 w-6 text-slate-500 mb-2" />
+                              <p className="font-medium text-slate-900">Course Oversight</p>
+                              <p className="text-xs text-slate-500">Approve content</p>
+                          </button>
+                           <button onClick={() => navigate('/admin/analytics')} className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-green-500 transition-all text-left">
+                              <TrendingUp className="h-6 w-6 text-slate-500 mb-2" />
+                              <p className="font-medium text-slate-900">Analytics</p>
+                              <p className="text-xs text-slate-500">View insights</p>
+                          </button>
+                          <button onClick={() => navigate('/settings')} className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-green-500 transition-all text-left">
+                              <Settings className="h-6 w-6 text-slate-500 mb-2" />
+                              <p className="font-medium text-slate-900">System Config</p>
+                              <p className="text-xs text-slate-500">Global settings</p>
+                          </button>
+                      </div>
+                  </Card>
+              </div>
           </div>
       );
   }

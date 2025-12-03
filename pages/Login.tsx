@@ -100,13 +100,13 @@ const Login: React.FC = () => {
         {/* MUST HEADER */}
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row items-center md:items-start space-x-4">
-            <div className="bg-white/80 p-2 rounded-xl shadow-sm backdrop-blur-sm">
+  
               <img 
-                src="https://sims.must.ac.tz/assets/images/logo.png"
+                src="../Assests/MUST_LOGO.jpg"
                 alt="MUST Logo" 
-                className="w-16 h-16 object-contain" 
+                className="w-17 h-17 object-contain" 
               />
-            </div>
+       
 
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-green-900 uppercase tracking-wide leading-tight">

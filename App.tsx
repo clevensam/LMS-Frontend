@@ -19,6 +19,14 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Announcements from './pages/Announcements';
 
+// Admin Pages
+import AdminUsers from './pages/AdminUsers';
+import AdminCourses from './pages/AdminCourses';
+import AdminAnalytics from './pages/AdminAnalytics';
+import AdminReports from './pages/AdminReports';
+import AdminCertificates from './pages/AdminCertificates';
+import Calendar from './pages/Calendar'
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
@@ -50,12 +58,20 @@ const App: React.FC = () => {
             <Route path="announcements" element={<Announcements />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="calendar" element={<Calendar />} />
             
             {/* Instructor Routes */}
             <Route path="instructor/courses" element={<InstructorCourses />} />
             <Route path="instructor/create-course" element={<CreateCourse />} />
             <Route path="instructor/course/:id/manage" element={<ManageCourse />} />
             <Route path="instructor/assessments" element={<Assessment />} />
+
+            {/* Admin Routes */}
+            <Route path="admin/users" element={<AdminUsers />} />
+            <Route path="admin/courses" element={<AdminCourses />} />
+            <Route path="admin/analytics" element={<AdminAnalytics />} />
+            <Route path="admin/reports" element={<AdminReports />} />
+            <Route path="admin/certificates" element={<AdminCertificates />} />
 
             <Route path="course/:id" element={<CoursePlayer />} />
             {/* Fallback for undefined routes */}

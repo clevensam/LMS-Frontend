@@ -1,5 +1,5 @@
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, Course, Achievement, Lesson, Submission, Post, Comment } from '../types';
+import { User, Course, Achievement, Lesson, Submission, Post, Comment, Certificate, CalendarEvent } from '../types';
 import { MOCK_USER, COURSES, ACHIEVEMENTS, COMMUNITY_POSTS } from '../constants';
 
 // --- Auth Slice ---
@@ -9,7 +9,7 @@ interface AuthState {
 }
 
 const initialAuthState: AuthState = {
-  user: null, // Start null to show login
+  user: null,
   isAuthenticated: false,
 };
 
@@ -51,7 +51,7 @@ const initialCourseState: CourseState = {
   submissions: [
       {
           id: 's1',
-          lessonId: 'l100', // Mock ID
+          lessonId: 'l100',
           studentId: 'u1',
           studentName: 'Alex Johnson',
           submittedAt: new Date().toISOString(),
@@ -74,16 +74,13 @@ const courseSlice = createSlice({
     },
     enrollCourse: (state, action: PayloadAction<string>) => {
       const course = state.catalog.find(c => c.id === action.payload);
-      // Check if already enrolled
       if (course && !state.enrolled.find(c => c.id === course.id)) {
-        // Initialize progress to 0
         const enrolledCourse = { ...course, progress: 0 };
         state.enrolled.push(enrolledCourse);
       }
     },
     updateProgress: (state, action: PayloadAction<{courseId: string, progress: number}>) => {
         const course = state.catalog.find(c => c.id === action.payload.courseId);
-        // Also update the enrolled instance
         const enrolledCourse = state.enrolled.find(c => c.id === action.payload.courseId);
         
         if (course) {
@@ -184,11 +181,9 @@ const communitySlice = createSlice({
         if (post) {
             const index = post.likedBy.indexOf(action.payload.userId);
             if (index > -1) {
-                // Unlike
                 post.likedBy.splice(index, 1);
                 post.likes--;
             } else {
-                // Like
                 post.likedBy.push(action.payload.userId);
                 post.likes++;
             }
@@ -216,12 +211,45 @@ const communitySlice = createSlice({
 
 export const { addPost, toggleLike, addComment, addReply } = communitySlice.actions;
 
+// --- Admin Slice ---
+interface AdminState {
+  certificates: Certificate[];
+  events: CalendarEvent[];
+}
+
+const initialAdminState: AdminState = {
+  certificates: [
+    { id: 'cert1', studentName: 'Maria Garcia', courseTitle: 'UI/UX Design Fundamentals', issueDate: '2023-10-10', code: 'MUST-UI-2023-001' }
+  ],
+  events: [
+    { id: 'ev1', title: 'System Maintenance', date: '2023-10-28', type: 'maintenance' },
+    { id: 'ev2', title: 'End of Semester Exams', date: '2023-11-15', type: 'exam' },
+    { id: 'ev3', title: 'Public Holiday', date: '2023-12-09', type: 'holiday' }
+  ]
+};
+
+const adminSlice = createSlice({
+  name: 'admin',
+  initialState: initialAdminState,
+  reducers: {
+    addEvent: (state, action: PayloadAction<CalendarEvent>) => {
+      state.events.push(action.payload);
+    },
+    issueCertificate: (state, action: PayloadAction<Certificate>) => {
+      state.certificates.push(action.payload);
+    }
+  }
+});
+
+export const { addEvent, issueCertificate } = adminSlice.actions;
+
 export const store = configureStore({
   reducer: {
     auth: authSlice.reducer,
     courses: courseSlice.reducer,
     gamification: gamificationSlice.reducer,
     community: communitySlice.reducer,
+    admin: adminSlice.reducer,
   },
 });
 
